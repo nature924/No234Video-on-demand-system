@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShipinCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shipin_id as shipinId
+        ,a.yonghu_id as yonghuId
+        ,a.shipin_collection_types as shipinCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShipinCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,shipin.shipin_name as shipinName
+        ,shipin.shipin_photo as shipinPhoto
+        ,shipin.shipin_video as shipinVideo
+        ,shipin.zan_number as zanNumber
+        ,shipin.cai_number as caiNumber
+        ,shipin.shipin_types as shipinTypes
+        ,shipin.shipin_clicknum as shipinClicknum
+        ,shipin.shipin_content as shipinContent
+        ,shipin.shipin_delete as shipinDelete
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.yonghu_delete as yonghuDelete
+
+        FROM shipin_collection  a
+        left JOIN shipin shipin ON a.shipin_id = shipin.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.shipinId != null and params.shipinId != ''">
+                and (
+                    a.shipin_id = #{params.shipinId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.shipinCollectionTypes != null and params.shipinCollectionTypes != ''">
+                and a.shipin_collection_types = #{params.shipinCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断视频信息的id不为空 -->
+            <if test=" params.shipinIdNotNull != '' and params.shipinIdNotNull != null and params.shipinIdNotNull != 'null' ">
+                and a.shipin_id IS NOT NULL
+            </if>
+            <if test=" params.shipinName != '' and params.shipinName != null and params.shipinName != 'null' ">
+                and shipin.shipin_name like CONCAT('%',#{params.shipinName},'%')
+            </if>
+            <if test=" params.shipinVideo != '' and params.shipinVideo != null and params.shipinVideo != 'null' ">
+                and shipin.shipin_video like CONCAT('%',#{params.shipinVideo},'%')
+            </if>
+            <if test="params.zanNumberStart != null  and params.zanNumberStart != '' ">
+                <![CDATA[  and shipin.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null  and params.zanNumberEnd != '' ">
+                <![CDATA[  and shipin.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+            <if test="params.zanNumber != null  and params.zanNumber != '' ">
+                and shipin.zan_number = #{params.zanNumber}
+            </if>
+            <if test="params.caiNumberStart != null  and params.caiNumberStart != '' ">
+                <![CDATA[  and shipin.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null  and params.caiNumberEnd != '' ">
+                <![CDATA[  and shipin.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+            <if test="params.caiNumber != null  and params.caiNumber != '' ">
+                and shipin.cai_number = #{params.caiNumber}
+            </if>
+            <if test="params.shipinTypes != null  and params.shipinTypes != ''">
+                and shipin.shipin_types = #{params.shipinTypes}
+            </if>
+
+            <if test="params.shipinClicknumStart != null  and params.shipinClicknumStart != '' ">
+                <![CDATA[  and shipin.shipin_clicknum >= #{params.shipinClicknumStart}   ]]>
+            </if>
+            <if test="params.shipinClicknumEnd != null  and params.shipinClicknumEnd != '' ">
+                <![CDATA[  and shipin.shipin_clicknum <= #{params.shipinClicknumEnd}   ]]>
+            </if>
+            <if test="params.shipinClicknum != null  and params.shipinClicknum != '' ">
+                and shipin.shipin_clicknum = #{params.shipinClicknum}
+            </if>
+            <if test=" params.shipinContent != '' and params.shipinContent != null and params.shipinContent != 'null' ">
+                and shipin.shipin_content like CONCAT('%',#{params.shipinContent},'%')
+            </if>
+            <if test="params.shipinDeleteStart != null  and params.shipinDeleteStart != '' ">
+                <![CDATA[  and shipin.shipin_delete >= #{params.shipinDeleteStart}   ]]>
+            </if>
+            <if test="params.shipinDeleteEnd != null  and params.shipinDeleteEnd != '' ">
+                <![CDATA[  and shipin.shipin_delete <= #{params.shipinDeleteEnd}   ]]>
+            </if>
+            <if test="params.shipinDelete != null  and params.shipinDelete != '' ">
+                and shipin.shipin_delete = #{params.shipinDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shipin.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shipin.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.yonghuDeleteStart != null  and params.yonghuDeleteStart != '' ">
+                <![CDATA[  and yonghu.yonghu_delete >= #{params.yonghuDeleteStart}   ]]>
+            </if>
+            <if test="params.yonghuDeleteEnd != null  and params.yonghuDeleteEnd != '' ">
+                <![CDATA[  and yonghu.yonghu_delete <= #{params.yonghuDeleteEnd}   ]]>
+            </if>
+            <if test="params.yonghuDelete != null  and params.yonghuDelete != '' ">
+                and yonghu.yonghu_delete = #{params.yonghuDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
